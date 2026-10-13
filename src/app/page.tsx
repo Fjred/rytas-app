@@ -1,12 +1,25 @@
 'use client'; // Reikalinga Next.js App Router interaktyvumui (useState)
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import TicketCard from './components/TicketCard';
 import ListGroup from './components/ListGroup';
-
 // 3. Pagrindinis puslapio komponentas
 export default function Home() {
   // React Būsena (useState) bandymams
+  const [seatCounts, setSeatCounts] = useState<number[]>([0, 0, 0]);
+
+  useEffect(() => {
+      fetch('/api/tickets')
+          .then(response => response.json())
+          .then(data => {
+              setSeatCounts([
+                  data.takenSeatsCount,
+                  data.freeSeatsCount,
+                  data.totalSeatsCount
+              ]);
+          })
+          .catch(error => console.error(error));
+  }, []);
   const [ticketsCount, setTicketsCount] = useState<number>(1950);
   const items = [
     'Arena',
@@ -36,7 +49,7 @@ export default function Home() {
       {/* Naudojame sukurtus React komponentus */}
       <div className="flex flex-col md:flex-row gap-4 w-full max-w-4xl justify-center items-center">
         <TicketCard title="BC Rytas vs Žalgiris" available={ticketsCount} taken={6471} />
-        <TicketCard title="BC Rytas vs Neptūnas" available={3200} taken={1500} />
+        <TicketCard title="BC Rytas vs ZK" available={seatCounts[1]} taken={seatCounts[0]} />
       </div>
 
       {/* Interaktyvus mygtukas useState pasitikrinimui */}
